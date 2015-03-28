@@ -1,0 +1,96 @@
+$screen-Size = {
+	mini: 480
+	small: 1024
+	average: 1440
+	large: 1920
+	jumbo: 2560
+	huge: 3840
+}
+	
+// -is-Set(value)
+// 	if value not null
+// 		true
+		
+-get(parameter, value, property = null)
+	if parameter is exists
+		if value not null
+			return true
+	if parameter is type
+		return type(value)
+	if parameter is calc
+		return value
+		
+-get-Type(value)
+	if value is a 'string'
+		return string
+	if value is a 'unit'
+		return unit
+	if value is a 'integer'
+		return integer
+
+-get-Width(value, property = null)
+	if -get(exists, property)
+		property * value
+	else
+		100% / value
+			
+-style(value, parameter, property = null)
+	if -get(exists, property)
+		{parameter}-{property}: value
+	else
+		{parameter}: value
+
+// -set-Background(value, property = null)
+// 	if -is-Set(property)
+// 		background-{property}: value
+// 	else
+// 		background: value
+
+// -set-Border(value, property = null)
+// 	if -is-Set(property)
+// 		border{property}: value
+// 	else
+// 		border-style: value
+
+//Normally you'd just want to let the content changed based
+//on the minimum width, and you'd only change that if you were
+//looking at 'print'
+-set-Query(value, query = null, property = null)
+	if -get(exists, query)
+		if -get(exists, property)
+			if property is print
+				@media print and ({query}: value)
+					{block}
+			if property is screen
+				@media screen and ({query}: value)
+					{block}
+		else
+			@media screen and ({query}: value)
+				{block}
+	else
+		@media screen and (min-width: value)
+			{block}
+
+body
+	.viewport
+		-style(100%, width)
+		-style(100%, height)
+		.container
+			-style(-get(calc, @width * .9), width)
+			-style(0 auto, margin)
+			.content
+				//width: (@width*$screen-Size.mini)
+				.header
+					-style(blue, background, color)
+				.navbar
+					-style(blue, background, color)
+				.page
+					-style(blue, background, color)
+				.footer
+					-style(blue, background, color)
+
+.test
+	-style(blue, background, color)
+	+-set-Query(($screen-Size.mini)px, max-height, print)
+		-style(red, background, color)
+		-style(1px dotted green, border)
